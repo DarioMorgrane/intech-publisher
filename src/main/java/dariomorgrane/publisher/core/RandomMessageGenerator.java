@@ -1,9 +1,9 @@
-package dariomorgrane.publisher.utilities;
+package dariomorgrane.publisher.core;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dariomorgrane.publisher.models.Action;
-import dariomorgrane.publisher.models.Message;
+import dariomorgrane.publisher.model.Action;
+import dariomorgrane.publisher.model.Message;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,32 +19,17 @@ public class RandomMessageGenerator implements MessageGenerator {
 
     @Value("${subscriberURL}")
     private String subscriberURL;
-
     private static final Logger LOG = LogManager.getLogger(RandomMessageGenerator.class);
     private Long currentId;
-    private ObjectMapper objectMapper;
-    private RestTemplate restTemplate;
-    private Random random;
+    private final ObjectMapper objectMapper;
+    private final RestTemplate restTemplate;
+    private final Random random;
 
     @Autowired
-    public void setRestTemplate(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
-    }
-
-    @Autowired
-    public void setObjectMapper(ObjectMapper objectMapper) {
+    public RandomMessageGenerator(ObjectMapper objectMapper, RestTemplate restTemplate, Random random) {
         this.objectMapper = objectMapper;
-    }
-
-    @Autowired
-    public void setRandom(Random random) {
+        this.restTemplate = restTemplate;
         this.random = random;
-    }
-
-    @PostConstruct
-    private void setupCurrentId() {
-        currentId = restTemplate.getForObject(subscriberURL, Long.class);
-        LOG.info("Received last used ID in DB - " + currentId + " (0 means DB is empty)");
     }
 
     public String generateMessage() throws JsonProcessingException {
@@ -56,6 +41,12 @@ public class RandomMessageGenerator implements MessageGenerator {
         message.setTimestamp(System.currentTimeMillis());
         LOG.info("Created object: " + message);
         return objectMapper.writeValueAsString(message);
+    }
+
+    @PostConstruct
+    private void setupCurrentId() {
+        currentId = restTemplate.getForObject(subscriberURL, Long.class);
+        LOG.info("Received last used ID in DB table - " + currentId + " (0 means DB table is empty)");
     }
 
 }

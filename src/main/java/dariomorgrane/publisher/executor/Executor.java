@@ -1,7 +1,7 @@
-package dariomorgrane.publisher.executors;
+package dariomorgrane.publisher.executor;
 
-import dariomorgrane.publisher.utilities.MessageGenerator;
-import dariomorgrane.publisher.utilities.MessageSender;
+import dariomorgrane.publisher.core.MessageGenerator;
+import dariomorgrane.publisher.core.MessageSender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -13,20 +13,15 @@ import java.util.concurrent.Executors;
 @Component
 public class Executor {
 
-    private MessageGenerator messageGenerator;
-    private MessageSender messageSender;
+    private final MessageGenerator messageGenerator;
+    private final MessageSender messageSender;
     private final BlockingQueue<String> queue = new ArrayBlockingQueue<>(25);
 
     @Autowired
-    public void setMessageGenerator(MessageGenerator messageGenerator) {
+    public Executor(MessageGenerator messageGenerator, MessageSender messageSender) {
         this.messageGenerator = messageGenerator;
-    }
-
-    @Autowired
-    public void setMessageSender(MessageSender messageSender) {
         this.messageSender = messageSender;
     }
-
 
     public void keepOnSending() throws Exception {
         new Producer().start();
@@ -51,8 +46,8 @@ public class Executor {
         }
     }
 
-    private class Consumer implements Runnable {
 
+    private class Consumer implements Runnable {
         String message;
 
         @Override

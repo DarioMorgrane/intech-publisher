@@ -1,4 +1,4 @@
-package dariomorgrane.publisher.utilities;
+package dariomorgrane.publisher.core;
 
 public interface MessageGenerator {
 

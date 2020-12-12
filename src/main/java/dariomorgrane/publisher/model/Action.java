@@ -1,4 +1,4 @@
-package dariomorgrane.publisher.models;
+package dariomorgrane.publisher.model;
 
 public enum Action {
     PURCHASE,
